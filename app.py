@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Welcome to Fetchbot API test"})
+    return jsonify({"message": "Welcome to Fetchbot API "})
 
 @app.route('/api/v1/status')
 def status():
