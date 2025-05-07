@@ -1,11 +1,11 @@
 steps:
   # Step 1: Build the Docker image from your source code
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/fetchbot-api', '.']
+    args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api', '.']
 
-  # Step 2: Push the Docker image to Google Container Registry
+  # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/fetchbot-api']
+    args: ['push', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api']
 
   # Step 3: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -15,7 +15,7 @@ steps:
       - 'deploy'
       - 'fetchbot-api'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/fetchbot-api'
+      - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
       - '--platform'
       - 'managed'
       - '--region'
@@ -24,7 +24,7 @@ steps:
 
 # Optionally list the image so it shows up in the Cloud Build UI
 images:
-  - 'gcr.io/$PROJECT_ID/fetchbot-api'
+  - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
 
 # Configure logging options
 options:
