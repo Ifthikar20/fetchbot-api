@@ -25,3 +25,7 @@ steps:
 # Optionally list the image so it shows up in the Cloud Build UI
 images:
   - 'gcr.io/$PROJECT_ID/fetchbot-api'
+
+# Configure logging options
+options:
+  logging: CLOUD_LOGGING_ONLY
