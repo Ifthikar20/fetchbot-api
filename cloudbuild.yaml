@@ -1,11 +1,11 @@
 steps:
   # Step 1: Build the Docker image from your source code
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api', '.']
+    args: ['build', '-t', 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api', '.']
 
   # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api']
+    args: ['push', 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api']
 
   # Step 3: Deploy the image to Cloud Run with secrets
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -15,7 +15,7 @@ steps:
       - 'deploy'
       - 'fetchbot-api'
       - '--image'
-      - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
+      - 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api'
       - '--platform'
       - 'managed'
       - '--region'
@@ -28,9 +28,11 @@ steps:
       - '--set-secrets'
       - 'SECRET_KEY=SECRET_KEY:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,DATABASE_URL=DATABASE_URL:latest,SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_KEY=SUPABASE_KEY:latest,OAUTH_CLIENT_ID=OAUTH_CLIENT_ID:latest,OAUTH_CLIENT_SECRET=OAUTH_CLIENT_SECRET:latest,OAUTH_CALLBACK_URL=OAUTH_CALLBACK_URL:latest'
 
+
+
 # Optionally list the image so it shows up in the Cloud Build UI
 images:
-  - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
+  - 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api'
 
 # Configure logging options
 options:
