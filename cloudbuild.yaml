@@ -1,13 +1,13 @@
 steps:
   # Step 1: Build the Docker image from your source code
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api', '.']
+    args: ['build', '-t', 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api', '.']
 
   # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api']
+    args: ['push', 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api']
 
-  # Step 3: Deploy the image to Cloud Run
+  # Step 3: Deploy the image to Cloud Run with secrets
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -15,16 +15,42 @@ steps:
       - 'deploy'
       - 'fetchbot-api'
       - '--image'
-      - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
+      - 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api'
       - '--platform'
       - 'managed'
       - '--region'
       - 'us-central1'
       - '--allow-unauthenticated'
+      # Set non-sensitive environment variables directly
+      - '--set-env-vars'
+      - 'FLASK_ENV=production,FLASK_DEBUG=False,RATELIMIT_DEFAULT=200 per day;50 per hour'
+      # Set sensitive environment variables from secrets
+      - '--set-secrets'
+      - 'SECRET_KEY=SECRET_KEY:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,DATABASE_URL=DATABASE_URL:latest,SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_KEY=SUPABASE_KEY:latest,OAUTH_CLIENT_ID=OAUTH_CLIENT_ID:latest,OAUTH_CLIENT_SECRET=OAUTH_CLIENT_SECRET:latest,OAUTH_CALLBACK_URL=OAUTH_CALLBACK_URL:latest'
+
+# Make secrets available to Cloud Build (not runtime)
+availableSecrets:
+  secretManager:
+  - versionName: projects/fetchbotproject/secrets/SECRET_KEY/versions/latest
+    env: 'SECRET_KEY'
+  - versionName: projects/fetchbotproject/secrets/JWT_SECRET_KEY/versions/latest
+    env: 'JWT_SECRET_KEY'
+  - versionName: projects/fetchbotproject/secrets/DATABASE_URL/versions/latest
+    env: 'DATABASE_URL'
+  - versionName: projects/fetchbotproject/secrets/SUPABASE_URL/versions/latest
+    env: 'SUPABASE_URL'
+  - versionName: projects/fetchbotproject/secrets/SUPABASE_KEY/versions/latest
+    env: 'SUPABASE_KEY'
+  - versionName: projects/fetchbotproject/secrets/OAUTH_CLIENT_ID/versions/latest
+    env: 'OAUTH_CLIENT_ID'
+  - versionName: projects/fetchbotproject/secrets/OAUTH_CLIENT_SECRET/versions/latest
+    env: 'OAUTH_CLIENT_SECRET'
+  - versionName: projects/fetchbotproject/secrets/OAUTH_CALLBACK_URL/versions/latest
+    env: 'OAUTH_CALLBACK_URL'
 
 # Optionally list the image so it shows up in the Cloud Build UI
 images:
-  - 'us-docker.pkg.dev/$PROJECT_ID/fetchbot-repo/fetchbot-api'
+  - 'us-docker.pkg.dev/fetchbotproject/fetchbot-repo/fetchbot-api'
 
 # Configure logging options
 options:
